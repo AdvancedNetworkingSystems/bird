@@ -28,7 +28,7 @@
 #include "nest/bfd.h"
 #include "conf/conf.h"
 #include "lib/string.h"
-
+#include "graph.h"
 
 #ifdef LOCAL_DEBUG
 #define OSPF_FORCE_DEBUG 1
@@ -856,6 +856,7 @@ void ospf_sh_neigh(struct proto *P, char *iff);
 void ospf_sh(struct proto *P);
 void ospf_sh_iface(struct proto *P, char *iff);
 void ospf_sh_state(struct proto *P, int verbose, int reachable);
+void ospf_sh_netjson(struct proto *P, int verbose, int reachable);
 
 void ospf_sh_lsadb(struct lsadb_show_data *ld);
 

@@ -442,6 +442,9 @@ CF_CLI(SHOW OSPF INTERFACE, optsym opttext, [<name>] [\"<interface>\"], [[Show i
 
 CF_CLI_HELP(SHOW OSPF TOPOLOGY, [all] [<name>], [[Show information about OSPF network topology]])
 
+CF_CLI(SHOW OSPF TOPOLOGY NETJSON, optsym opttext, [<name>], [[Show information about reachable OSPF network topology]])
+{ ospf_sh_netjson(proto_get_named($5, &proto_ospf), 0, 1); };
+
 CF_CLI(SHOW OSPF TOPOLOGY, optsym opttext, [<name>], [[Show information about reachable OSPF network topology]])
 { ospf_sh_state(proto_get_named($4, &proto_ospf), 0, 1); };
 
