@@ -14,8 +14,16 @@ struct ng_topology{
 
 };
 
+struct ng_metrics{
+	uint16_t metric;
+	uint32_t network;
+	uint32_t netmask;
+	struct ng_metrics *next;
+};
+
 struct ng_node{
 	char *id;
+	struct ng_metrics *metric_list;
 	struct ng_neighbor *neighbor_list;
 	struct ng_node *next;
 };

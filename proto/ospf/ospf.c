@@ -1018,20 +1018,20 @@ show_lsa_router(struct ospf_proto *p, struct top_hash_entry *he, int verbose)
     {
       if (ospf_is_v2(p))
       {
-	/* In OSPFv2, we try to find network-LSA to get prefix/pxlen */
-	struct top_hash_entry *net_he = ospf_hash_find_net2(p->gr, he->domain, rtl.id);
+      	/* In OSPFv2, we try to find network-LSA to get prefix/pxlen */
+      	struct top_hash_entry *net_he = ospf_hash_find_net2(p->gr, he->domain, rtl.id);
 
-	if (net_he && (net_he->lsa.age < LSA_MAXAGE))
-	{
-	  struct ospf_lsa_header *net_lsa = &(net_he->lsa);
-	  struct ospf_lsa_net *net_ln = net_he->lsa_body;
+      	if (net_he && (net_he->lsa.age < LSA_MAXAGE))
+      	{
+      	  struct ospf_lsa_header *net_lsa = &(net_he->lsa);
+      	  struct ospf_lsa_net *net_ln = net_he->lsa_body;
 
-	  cli_msg(-1016, "\t\tnetwork %I/%d metric %u",
-		  ipa_from_u32(net_lsa->id & net_ln->optx),
-		  u32_masklen(net_ln->optx), rtl.metric);
-	}
-	else
-	  cli_msg(-1016, "\t\tnetwork [%R] metric %u", rtl.id, rtl.metric);
+      	  cli_msg(-1016, "\t\tnetwork %I/%d metric %u",
+      		  ipa_from_u32(net_lsa->id & net_ln->optx),
+      		  u32_masklen(net_ln->optx), rtl.metric);
+      	}
+      	else
+      	  cli_msg(-1016, "\t\tnetwork [%R] metric %u", rtl.id, rtl.metric);
       }
       else
 	cli_msg(-1016, "\t\tnetwork [%R-%u] metric %u", rtl.id, rtl.nif, rtl.metric);
@@ -1461,12 +1461,31 @@ ospf_sh_netjson(struct proto *P, int verbose, int reachable)
     switch (he->lsa_type)
     {
     case LSA_T_RT:
-      if (he->lsa.id == cnode->lsa.id)
+      if (he->lsa.id == cnode->lsa.id){
         add_node(topo, uint_to_string(he->lsa.rt));
+        struct ospf_lsa_rt_walk rtl;
+        lsa_walk_rt_init(p, he, &rtl);
+        if (rtl.type == LSART_NET){
+          if (ospf_is_v2(p))
+          {
+            struct top_hash_entry *net_he = ospf_hash_find_net2(p->gr, he->domain, rtl.id);
+          	if (net_he && (net_he->lsa.age < LSA_MAXAGE))
+          	{
+          	  struct ospf_lsa_header *net_lsa = &(net_he->lsa);
+          	  struct ospf_lsa_net *net_ln = net_he->lsa_body;
+              add_metric(topo->first, net_lsa->id & net_ln->optx, net_ln->optx, rtl.metric);
+          	}
+          }
+        }
+      }
       break;
 
     case LSA_T_NET:
-        add_edge(topo, uint_to_string(ln->routers[0]), uint_to_string(ln->routers[1]), 1);
+      {
+        struct ospf_lsa_net *ln = he->lsa_body;
+        add_complete_graph_edges(topo, ln->routers, lsa_net_count(&(he->lsa)), he->lsa.id & ln->optx);
+
+      }
       break;
 
     case LSA_T_SUM_NET:
@@ -1475,10 +1494,9 @@ ospf_sh_netjson(struct proto *P, int verbose, int reachable)
       break;
 
     case LSA_T_SUM_RT:
-      if (cnode->lsa_type == LSA_T_RT)
-	//show_lsa_sum_rt(he, ospf2);
+      //if (cnode->lsa_type == LSA_T_RT)
+	     //show_lsa_sum_rt(he, ospf2);
       break;
-
     case LSA_T_EXT:
     case LSA_T_NSSA:
       //show_lsa_external(he, ospf2);
@@ -1536,7 +1554,16 @@ ospf_sh_netjson(struct proto *P, int verbose, int reachable)
       show_lsa_external(he, ospf2);
     }
   }
-  cli_msg(-1016, "%s", compose_netjson(topo));
+  char *netjson = compose_netjson(topo);
+  int sent = 0;
+  int block = 500;
+  while(sent*block < strlen(netjson)){
+    char temp[block];
+    strncpy(temp, netjson, block-1);
+    temp[block] = '\0';
+    netjson +=block-1;
+    cli_msg(100, "%s", temp);
+  }
   cli_msg(0, "");
 }
 

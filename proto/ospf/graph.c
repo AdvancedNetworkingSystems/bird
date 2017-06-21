@@ -15,6 +15,15 @@ int add_node(struct ng_topology * topo, const char *id)
 	return 1;
 }
 
+int add_metric(struct ng_node * node, const uint32_t network, const uint32_t netmask, uint16_t metric){
+	struct ng_metrics *temp = node->metric_list;
+	node->metric_list = (struct ng_metrics*)malloc(sizeof(struct ng_metrics));
+	node->metric_list->network = network;
+	node->metric_list->netmask = netmask;
+	node->metric_list->metric = metric;
+	node->metric_list->next =temp;
+	return 1;
+}
 /**
 * Find a node in the topology data structure
 * @param struct topology*  pointer to the topology data structure
@@ -54,6 +63,19 @@ int add_edge(struct ng_topology *topo, const char *source, const char *id, const
 	n->neighbor_list->next=temp;
 	return 1;
 
+}
+
+int add_complete_graph_edges(struct ng_topology *topo, unsigned int routers[], int n_nodes,  uint32_t network){
+	//count number of nodes in the subnet
+	int i, j;
+	//build the complete graph
+	for(i=0; i<n_nodes; i++){
+		for(j=0; j<n_nodes; j++){
+			if(i!=j)
+				add_edge(topo, uint_to_string(routers[i]), uint_to_string(routers[j]), 1);
+		}
+	}
+	return 1;
 }
 
 /**
