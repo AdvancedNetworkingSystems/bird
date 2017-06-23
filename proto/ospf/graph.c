@@ -12,6 +12,7 @@ int add_node(struct ng_topology * topo, const char *id)
 	topo->first->next=temp;
 	topo->first->id=strdup(id);
 	topo->first->neighbor_list=0;
+	topo->first->metric_list=0;
 	return 1;
 }
 
@@ -49,7 +50,7 @@ struct ng_node* find_node(struct ng_topology *topo,const char *id)
 * @param const double  cost of the edge
 * @return 1 on success, 0 otherwise
 */
-int add_edge(struct ng_topology *topo, const char *source, const char *id, const double weight)
+int add_edge(struct ng_topology *topo, const char *source, const char *id, uint32_t network)
 {
 	struct ng_neighbor *temp;
 	struct ng_node* n;
@@ -59,10 +60,21 @@ int add_edge(struct ng_topology *topo, const char *source, const char *id, const
 	n->neighbor_list=(struct ng_neighbor*)malloc(sizeof(struct ng_neighbor));
 	if((n->neighbor_list->id=find_node(topo, id))==0)
 		return 0;
+	int weight = find_weight(n,network);
+	if(weight==0){
+		return 0;
+	}
 	n->neighbor_list->weight=weight;
 	n->neighbor_list->next=temp;
 	return 1;
+}
 
+int find_weight(struct ng_node *n, const uint32_t network){
+	struct ng_metrics *metric;
+	for(metric=n->metric_list; metric!=0; metric = metric->next)
+		if(metric->network==network)
+			return metric->metric;
+	return -1;
 }
 
 int add_complete_graph_edges(struct ng_topology *topo, unsigned int routers[], int n_nodes,  uint32_t network){
@@ -72,7 +84,7 @@ int add_complete_graph_edges(struct ng_topology *topo, unsigned int routers[], i
 	for(i=0; i<n_nodes; i++){
 		for(j=0; j<n_nodes; j++){
 			if(i!=j)
-				add_edge(topo, uint_to_string(routers[i]), uint_to_string(routers[j]), 1);
+				add_edge(topo, uint_to_string(routers[i]), uint_to_string(routers[j]), network);
 		}
 	}
 	return 1;

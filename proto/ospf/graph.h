@@ -39,7 +39,7 @@ const char * compose_netjson(struct ng_topology * c_topo);
 
 int add_node(struct ng_topology * topo, const char *id);
 struct ng_topology * _init_topo(int type);
-int add_edge(struct ng_topology *topo, const char *source, const char *id, const double weight);
+int add_edge(struct ng_topology *topo, const char *source, const char *id, uint32_t network);
 void destroy_topo(struct ng_topology *topo);
 struct ng_node* find_node(struct ng_topology *topo, const char *id);
 char * uint_to_string(uint32_t address);
