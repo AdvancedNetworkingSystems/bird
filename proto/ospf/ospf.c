@@ -1464,21 +1464,21 @@ ospf_sh_netjson(struct proto *P, int verbose, int reachable)
 
       if (he->lsa.id == cnode->lsa.id){
         add_node(topo, uint_to_string(he->lsa.rt));
-        struct ospf_lsa_rt_walk rtl;
-        lsa_walk_rt_init(p, he, &rtl);
-        while (lsa_walk_rt(&rtl))
-          if (rtl.type == LSART_NET){
-            if (ospf_is_v2(p))
-            {
-              struct top_hash_entry *net_he = ospf_hash_find_net2(p->gr, he->domain, rtl.id);
-            	if (net_he && (net_he->lsa.age < LSA_MAXAGE))
-            	{
-            	  struct ospf_lsa_header *net_lsa = &(net_he->lsa);
-            	  struct ospf_lsa_net *net_ln = net_he->lsa_body;
-                add_metric(topo->first, net_lsa->id & net_ln->optx, net_ln->optx, rtl.metric);
-            	}
-            }
-          }
+      	struct ospf_lsa_rt_walk rtl;
+      	lsa_walk_rt_init(p, he, &rtl);
+      	while (lsa_walk_rt(&rtl))
+      		if (rtl.type == LSART_NET){
+      			if (ospf_is_v2(p))
+      			{
+      				struct top_hash_entry *net_he = ospf_hash_find_net2(p->gr, he->domain, rtl.id);
+      				if (net_he && (net_he->lsa.age < LSA_MAXAGE))
+      				{
+      					struct ospf_lsa_header *net_lsa = &(net_he->lsa);
+      					struct ospf_lsa_net *net_ln = net_he->lsa_body;
+      					add_metric(topo->first, net_lsa->id & net_ln->optx, net_ln->optx, rtl.metric);
+      				}
+      			}
+      		}
       }
       break;
 

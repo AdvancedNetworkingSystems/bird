@@ -1,4 +1,5 @@
 #include "graph.h"
+
 /**
 * Add a node to the topology data structure
 * @param struct topology*  pointer to the topology data structure
@@ -141,6 +142,10 @@ const char * compose_netjson(struct ng_topology * c_topo){
 	cJSON *topo = cJSON_CreateObject();
 	cJSON *nodes;
 	cJSON *node;
+	cJSON_AddStringToObject(topo, "type", "NetworkGraph");
+	cJSON_AddStringToObject(topo, "protocol", "OSPFv2");
+	cJSON_AddStringToObject(topo, "version", "0.1");
+	cJSON_AddStringToObject(topo, "metric", "none");
 	cJSON_AddItemToObject(topo, "nodes", nodes = cJSON_CreateArray());
 	//compose the list of nodes
 	for(punt=c_topo->first; punt!=0; punt=punt->next){
@@ -149,7 +154,7 @@ const char * compose_netjson(struct ng_topology * c_topo){
 	}
 	cJSON *edges;
 	cJSON *edge;
-	cJSON_AddItemToObject(topo, "edges", edges = cJSON_CreateArray());
+	cJSON_AddItemToObject(topo, "links", edges = cJSON_CreateArray());
 	//compose the list of edges
 	for(punt=c_topo->first; punt!=0; punt=punt->next){
 		struct ng_neighbor* neigh;
