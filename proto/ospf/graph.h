@@ -35,7 +35,7 @@ struct ng_neighbor{
 	struct ng_neighbor *next;
 };
 
-const char * compose_netjson(struct ng_topology * c_topo);
+const char * compose_netjson(struct ng_topology * c_topo, uint32_t router_id);
 
 int add_node(struct ng_topology * topo, const char *id);
 struct ng_topology * _init_topo(int type);

@@ -1556,7 +1556,7 @@ ospf_sh_netjson(struct proto *P, int verbose, int reachable)
       show_lsa_external(he, ospf2);
     }
   }
-  char *netjson = compose_netjson(topo);
+  char *netjson = compose_netjson(topo, config->router_id);
   int sent = 0;
   int block = 500;
   while(sent*block < strlen(netjson)){

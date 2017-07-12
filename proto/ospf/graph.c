@@ -137,7 +137,7 @@ void destroy_topo(struct ng_topology *topo)
 *Compose a NetJSON object and return its string representation1
 */
 
-const char * compose_netjson(struct ng_topology * c_topo){
+const char * compose_netjson(struct ng_topology * c_topo, uint32_t router_id){
 	struct ng_node *punt;
 	cJSON *topo = cJSON_CreateObject();
 	cJSON *nodes;
@@ -146,6 +146,7 @@ const char * compose_netjson(struct ng_topology * c_topo){
 	cJSON_AddStringToObject(topo, "protocol", "OSPFv2");
 	cJSON_AddStringToObject(topo, "version", "0.1");
 	cJSON_AddStringToObject(topo, "metric", "none");
+	cJSON_AddStringToObject(topo, "router_id", uint_to_string(router_id));
 	cJSON_AddItemToObject(topo, "nodes", nodes = cJSON_CreateArray());
 	//compose the list of nodes
 	for(punt=c_topo->first; punt!=0; punt=punt->next){
